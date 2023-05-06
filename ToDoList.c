@@ -62,19 +62,15 @@ int main() {
             	saveToFile();
             	break;
             case 6:
-				readFromFile();
-				break;
+		readFromFile();
+		break;
             case 7:
                 exit(0);
             default:
 printf("\nInvalid choice! Please try again.\n");
-}
-}
-}
-    
-    
-
-
+		}
+	}
+ }
 void seeToDo() {
     system("cls");
     todo *temp = start;
@@ -95,7 +91,6 @@ void seeToDo() {
     printf("\n");
     system("pause");
 }
-
 void createToDo(){
     char k;
     todo *t,*temp;
@@ -133,9 +128,6 @@ void createToDo(){
     }
     fclose(fp); // close the file
 }
-
-
-
 void delToDo(){
   system("cls");
   int d;
@@ -247,8 +239,6 @@ void readFromFile() {
     fclose(fp);
     system("pause");
 }
-
-
 
 void fixcount(){
   todo * temp;
