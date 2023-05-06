@@ -4,7 +4,7 @@
 typedef struct ToDo todo;
 
 struct ToDo {
-    char data[100];
+    char data[1800];
     todo *link;
     int count;
 };
@@ -27,6 +27,8 @@ void createToDo();
 void delToDo();
 void fixcount();
 void updateToDo();
+void saveToFile();
+void readFromFile();
 
 int main() {
     int choice;
@@ -34,10 +36,13 @@ int main() {
     while (1) {
         system("color 8F");
         system("cls");
-        printf("\n1.See Your ToDo List");
-        printf("\n2.Create Your ToDos");
-        printf("\n3.Delete Your ToDos");
-        printf("\n4.Exit");
+        printf("\n1.See Your ToDo List.");
+        printf("\n2.Create Your ToDos.");
+        printf("\n3.Delete Your ToDos.");
+        printf("\n4.update your ToDos.");
+        printf("\n5.save your todos in File.");
+        printf("\n6.read your Todos from file.");
+        printf("\n7.Exit");
         printf("\n\nEnter your choice..");
         scanf("%d", &choice);
         switch (choice) {
@@ -51,36 +56,54 @@ int main() {
                 delToDo();
                 break;
             case 4:
+            	updateToDo();
+            	break;
+            case 5:
+            	saveToFile();
+            	break;
+            case 6:
+				readFromFile();
+				break;
+            case 7:
                 exit(0);
-        }
-    }
+            default:
+printf("\nInvalid choice! Please try again.\n");
 }
+}
+}
+    
+    
+
 
 void seeToDo() {
     system("cls");
     todo *temp = start;
     int count = 0;
-    if (temp == NULL) { 
-        printf("\nYour ToDo list is empty.\n\n");
-    } else {
-        printf("\nYour ToDo list:\n\n");
-        while (temp != NULL) {
-            printf("%d) %s\n", temp->count, temp->data);
-            count++;
-            temp = temp->link;
-        } 
-        printf("\nTotal %d items.\n\n", count);
+
+    if (temp == NULL) {
+        printf("Your todo list is empty.\n");
+        system("pause");
+        return;
     }
+
+    printf("ToDo List:\n");
+    while (temp != NULL) {
+        count++;
+        printf("%d. %s\n", count, temp->data);
+        temp = temp->link;
+    }
+    printf("\n");
     system("pause");
 }
-
 
 void createToDo(){
     char k;
     todo *t,*temp;
     system("cls");
+    FILE *fp;
+    fp = fopen("todos.txt", "a"); // open file in append mode
     while(1){
-        printf("\nWant to add?y/n");
+        printf("\nWant to add? y/n ");
         fflush(stdin);
         scanf("%c",&k);
         if(k=='n')
@@ -102,11 +125,16 @@ void createToDo(){
                 gets(temp->data);
                 temp->link=NULL;
                 t->link=temp;
-                t=t->link;
+                t=t->link; // Fix: assign the new todo item to t instead of temp
             }
+            // write data to file
+            fprintf(fp, "%s\n", t->data); // Fix: write the new todo item to file using t instead of temp
         }
     }
+    fclose(fp); // close the file
 }
+
+
 
 void delToDo(){
   system("cls");
@@ -136,6 +164,91 @@ void delToDo(){
 }
 system("pause");
 }
+
+void updateToDo() {
+	system("cls");
+    int n, flag = 0;
+    todo *temp = start;
+
+    if (temp == NULL) {
+        printf("Error! Your ToDo list is empty.\n");
+        system("pause");
+        return;
+    }
+
+    printf("Enter the number of ToDo list to update: ");
+    scanf("%d", &n);
+
+    while (temp != NULL) {
+        if (temp->count == n) {
+            flag = 1;
+            printf("Enter updated ToDo task: ");
+            scanf(" %[^\n]", temp->data);
+            printf("ToDo list updated successfully.\n");
+
+            // write changes to file
+            FILE *fp;
+            fp = fopen("todos.txt", "w");
+            todo *t = start;
+            while (t != NULL) {
+                fprintf(fp, "%s\n", t->data);
+                t = t->link;
+            }
+            fclose(fp);
+
+            break;
+        }
+        temp = temp->link;
+    }
+
+    if (flag == 0) {
+        printf("Error! ToDo list with count %d does not exist.\n", n);
+    }
+system("pause");
+}
+
+void saveToFile(){
+    FILE *fp;
+    todo *temp = start;
+    fp = fopen("todos.txt", "w"); // open file in write mode
+    if(fp == NULL) {
+        printf("Error opening file.\n");
+        return;
+    }
+    while(temp != NULL) {
+        fprintf(fp, "%s\n", temp->data);
+        temp = temp->link;
+    }
+    fclose(fp);
+    printf("Your ToDo list has been saved to file successfully.\n");
+    system("pause");
+}
+
+void readFromFile() {
+	system("cls");
+    FILE *fp;
+    char line[1800];
+    int count = 0;
+    fp = fopen("todos.txt", "r");
+
+    if (fp == NULL) {
+        printf("Failed to open the file.\n");
+        return;
+    }
+
+    printf("Your ToDo List from file:\n");
+
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        printf("%s", line);
+        count++;
+    }
+
+    printf("\nTotal %d items.\n\n", count);
+    fclose(fp);
+    system("pause");
+}
+
+
 
 void fixcount(){
   todo * temp;
